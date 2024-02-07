@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 
+//Window resolution
 #define WIDTH 1280
 #define HEIGHT 960
 
@@ -9,7 +10,7 @@ bool running, fullscreen;
 SDL_Renderer* renderer;
 SDL_Window* window;
 SDL_Rect tile;
-float tileScale = 1.5;
+float tileScale = 1.75;
 int OffsetX = 0;
 int OffsetY = 0;
 
@@ -130,15 +131,15 @@ int king[16][16]=
 };
 #pragma endregion
 
-int ChessBoard[8][8] = { {13,-14,15,-16,17,-15,14,-13},     /* Pawn_W      ->   |x| = 2 Pawn_B      ->   |x| = 12 */
-                         {-12,12,-12,12,-12,12,-12,12},     /* Rook_W      ->   |x| = 3 Rook_B      ->   |x| = 13 */
-                         {1,-1,1,-1,1,-1,1,-1},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
-                         {-1,1,-1,1,-1,1,-1,1},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
-                         {1,-1,1,-1,1,-1,1,-1},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
-                         {-1,1,-1,1,-1,1,-1,1},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
-                         {2,-2,2,-2,2,-2,2,-2},             /* (x < 0)   ->   Black tile */
-                         {-3,4,-5,6,-7,5,-4,3}              /* (x > 0)   ->   White tile */
-                                            };              /* |x| = 1   ->   Empty tile */
+int ChessBoard[8][8] = { {13,  -14,  15, -16,  17, -15,  14, -13},             /* Pawn_W      ->   |x| = 2 Pawn_B      ->   |x| = 12 */
+                         {-12,  12, -12,  12, -12,  12, -12,  12},             /* Rook_W      ->   |x| = 3 Rook_B      ->   |x| = 13 */
+                         {  1,  -1,   1,  -1,   1,  -1,   1,  -1},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
+                         { -1,   1,  -1,   1,  -1,   1,  -1,   1},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
+                         {  1,  -1,   1,  -1,   1,  -1,   1,  -1},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
+                         { -1,   1,  -1,   1,  -1,   1,  -1,   1},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
+                         {  2,  -2,   2,  -2,   2,  -2,   2,  -2},             /* (x < 0)   ->   Black tile */
+                         { -3,   4,  -5,   6,  -7,   5,  -4,   3}              /* (x > 0)   ->   White tile */
+                                                                };             /* |x| = 1   ->   Empty tile */
 
 
 void input()
@@ -193,8 +194,8 @@ void drawPiece(int piece, int x, int y)
         {
             for (int k=0; k < tile.h; k++)
             {
-                int scaled_x_cord = k / 6;
-                int scaled_y_cord = i / 6;
+                int scaled_x_cord = k / (tile.w/16);
+                int scaled_y_cord = i / (tile.h/16);
                 if (texture[scaled_x_cord][scaled_y_cord] == 1)
                 {
                     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -214,14 +215,14 @@ void drawPiece(int piece, int x, int y)
             {
                 for (int k = 0; k < tile.h; k++)
                 {
-                    int x_cord = k / 6;
-                    int y_cord = i / 6;
-                    if (texture[x_cord][y_cord] == 1)
+                    int scaled_x_cord = k / (tile.w / 16);
+                    int scaled_y_cord = i / (tile.h / 16);
+                    if (texture[scaled_x_cord][scaled_y_cord] == 1)
                     {
                         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
                         SDL_RenderDrawPoint(renderer, x + i, y + k);
                     }
-                    else if (texture[x_cord][y_cord] == 2)
+                    else if (texture[scaled_x_cord][scaled_y_cord] == 2)
                     {
                         SDL_SetRenderDrawColor(renderer, 40, 40, 40, 0);
                         SDL_RenderDrawPoint(renderer, x + i, y + k);
