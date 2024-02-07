@@ -3,11 +3,27 @@
 #include <cmath>
 
 #define WIDTH 1280
-#define HEIGHT 640
+#define HEIGHT 960
 
 bool running, fullscreen;
 SDL_Renderer* renderer;
 SDL_Window* window;
+SDL_Rect tile;
+float tileScale = 1.5;
+int OffsetX = 0;
+int OffsetY = 0;
+
+int ChessBoard[8][8] = { {3,-4,5,-6,7,-5,4,-3},     /* Pawn      ->   |x| = 2 */
+                         {-2,2,-2,2,-2,2,-2,2},     /* Rook      ->   |x| = 3 */
+                         {1,-1,1,-1,1,-1,1,-1},     /* Knight    ->   |x| = 4 */
+                         {-1,1,-1,1,-1,1,-1,1},     /* Bishop    ->   |x| = 5 */
+                         {1,-1,1,-1,1,-1,1,-1},     /* Queen     ->   |x| = 6 */
+                         {-1,1,-1,1,-1,1,-1,1},     /* King      ->   |x| = 7 */
+                         {2,-2,2,-2,2,-2,2,-2},     /* (x < 0)   ->   Black tile */
+                         {-3,4,-5,6,-7,5,-4,3}      /* (x > 0)   ->   White tile */
+                                            };      /* |x| = 1   ->   Empty tile */
+
+
 void input()
 {
     SDL_Event e;
@@ -20,7 +36,12 @@ void input()
 }
 void init()
 {
-
+    tile.w = tileScale*64;
+    tile.h = tileScale*64;
+    tile.x = 0;
+    tile.y = 0;
+    OffsetX = (WIDTH - tile.w * 8) / 2;
+    OffsetY = (HEIGHT - tile.w * 8) / 2;
 }
 
 void update()
@@ -29,13 +50,37 @@ void update()
     if (!fullscreen) SDL_SetWindowFullscreen(window, 0);
 }
 
-void draw()
+void drawChessboard()
 {
 
-    SDL_SetRenderDrawColor(renderer, 20, 20, 20, 0);
+    for (int i = 0; i < 8; i++)
+    {
+        tile.y = i * tile.h + OffsetY;
+        for (int k = 0; k < 8; k++)
+        {
+            tile.x = k * tile.w + OffsetX;
+            if (ChessBoard[i][k] <0)
+            {
+                SDL_SetRenderDrawColor(renderer, 87, 65, 47, 255);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(renderer, 213, 196, 161, 255);
+            }
+            SDL_RenderFillRect(renderer, &tile);
+        }
+    }
+}
+
+void draw()
+{
+    
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 0);
     SDL_RenderFillRect(renderer, NULL);
+    drawChessboard();
     SDL_RenderPresent(renderer);
 }
+
 
 int main(int argc, char* argv[])
 {
