@@ -13,6 +13,7 @@ SDL_Rect tile;
 float tileScale = 1.75;
 int OffsetX = 0;
 int OffsetY = 0;
+bool selected = false;
 
 #pragma region pieces_textures
 int pawn[16][16] = 
@@ -141,6 +142,8 @@ int ChessBoard[8][8] = { {13,  -14,  15, -16,  17, -15,  14, -13},             /
                          { -3,   4,  -5,   6,  -7,   5,  -4,   3}              /* (x > 0)   ->   White tile */
                                                                 };             /* |x| = 1   ->   Empty tile */
 
+int ChessBoardToDraw[8][8] = { 0 };
+
 
 void input()
 {
@@ -148,12 +151,29 @@ void input()
     while (SDL_PollEvent(&e))
     {
         if (e.type == SDL_QUIT) running = false;
+        if (e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            SDL_MouseButtonEvent& b=e.button;
+            if (b.button == SDL_BUTTON_LEFT)
+            {
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+                mouseX = (int)((mouseX-OffsetX) / tile.w);
+                mouseY = (int)((mouseY-OffsetY) / tile.h);
+                ChessBoardToDraw[mouseY][mouseX] = 16;
+            }
+            if (b.button == SDL_BUTTON_RIGHT)
+            {
+                memcpy(ChessBoardToDraw, ChessBoard, sizeof(ChessBoard));
+            }
+        }
     }
     const Uint8* keystates = SDL_GetKeyboardState(NULL);
     if (keystates[SDL_SCANCODE_ESCAPE]) running = false;
 }
 void init()
 {
+    memcpy(ChessBoardToDraw, ChessBoard, sizeof(ChessBoard));
     tile.w = tileScale*64;
     tile.h = tileScale*64;
     tile.x = 0;
@@ -243,7 +263,7 @@ void drawChessboard()
         for (int k = 0; k < 8; k++)
         {
             tile.x = k * tile.w + OffsetX;
-            if (ChessBoard[i][k] <0)
+            if (ChessBoardToDraw[i][k] <0)
             {
                 SDL_SetRenderDrawColor(renderer, 87, 65, 47, 255);
             }
@@ -252,9 +272,9 @@ void drawChessboard()
                 SDL_SetRenderDrawColor(renderer, 213, 196, 161, 255);
             }
             SDL_RenderFillRect(renderer, &tile);
-            if (abs(ChessBoard[i][k]) != 1 )
+            if (abs(ChessBoardToDraw[i][k]) != 1 )
             {
-                drawPiece(abs(ChessBoard[i][k]), tile.x, tile.y);
+                drawPiece(abs(ChessBoardToDraw[i][k]), tile.x, tile.y);
             }
         }
     }
