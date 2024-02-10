@@ -207,13 +207,26 @@ void drawMovesIndicator(int piece)
     SDL_SetRenderDrawColor(renderer, 0, 0, 120, 150);
     if (piece == 2)
     {
-        ChessBoardToDraw[(mouseYglobal - 1)][mouseXglobal] = 1;
-        ChessBoardToDraw[(mouseYglobal - 2)][mouseXglobal] = 1;
-        tile.x = mouseXglobal * tile.w + OffsetX;
-        tile.y = (mouseYglobal - 1) * tile.h + OffsetY;
-        SDL_RenderFillRect(renderer, &tile);
-        tile.y -= tile.h;
-        SDL_RenderFillRect(renderer, &tile);
+        if (mouseYglobal == 6)
+        {
+            ChessBoardToDraw[(mouseYglobal - 1)][mouseXglobal] = 1;
+            ChessBoardToDraw[(mouseYglobal - 2)][mouseXglobal] = 1;
+            tile.x = mouseXglobal * tile.w + OffsetX;
+            tile.y = (mouseYglobal - 1) * tile.h + OffsetY;
+            SDL_RenderFillRect(renderer, &tile);
+            tile.y -= tile.h;
+            SDL_RenderFillRect(renderer, &tile);
+        }
+        else
+        {
+            if (ChessBoardToDraw[(mouseYglobal - 1)][mouseXglobal] <=1 )
+            {
+                ChessBoardToDraw[(mouseYglobal - 1)][mouseXglobal] = 1;
+                tile.x = mouseXglobal * tile.w + OffsetX;
+                tile.y = (mouseYglobal - 1) * tile.h + OffsetY;
+                SDL_RenderFillRect(renderer, &tile);
+            }
+        }
 
     }
     
