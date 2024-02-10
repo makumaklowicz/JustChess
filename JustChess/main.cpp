@@ -132,14 +132,14 @@ int king[16][16]=
 };
 #pragma endregion
 
-int ChessBoard[8][8] = { {13,  -14,  15, -16,  17, -15,  14, -13},             /* Pawn_W      ->   |x| = 2 Pawn_B      ->   |x| = 12 */
-                         {-12,  12, -12,  12, -12,  12, -12,  12},             /* Rook_W      ->   |x| = 3 Rook_B      ->   |x| = 13 */
-                         {  1,  -1,   1,  -1,   1,  -1,   1,  -1},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
-                         { -1,   1,  -1,   1,  -1,   1,  -1,   1},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
-                         {  1,  -1,   1,  -1,   1,  -1,   1,  -1},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
-                         { -1,   1,  -1,   1,  -1,   1,  -1,   1},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
-                         {  2,  -2,   2,  -2,   2,  -2,   2,  -2},             /* (x < 0)   ->   Black tile */
-                         { -3,   4,  -5,   6,  -7,   5,  -4,   3}              /* (x > 0)   ->   White tile */
+int ChessBoard[8][8] = { {13,  14,  15, 16,  17, 15,  14, 13},             /* Pawn_W      ->   |x| = 2 Pawn_B      ->   |x| = 12 */
+                         {12,  12,  12, 12,  12, 12,  12, 12},             /* Rook_W      ->   |x| = 3 Rook_B      ->   |x| = 13 */
+                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
+                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
+                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
+                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
+                         { 2,   2,  2,   2,  2,   2,  2,   2},             /* (x < 0)   ->   Black tile */
+                         { 3,   4,  5,   6,  7,   5,  4,   3}              /* (x > 0)   ->   White tile */
                                                                 };             /* |x| = 1   ->   Empty tile */
 
 int ChessBoardToDraw[8][8] = { 0 };
@@ -263,18 +263,33 @@ void drawChessboard()
         for (int k = 0; k < 8; k++)
         {
             tile.x = k * tile.w + OffsetX;
-            if (ChessBoardToDraw[i][k] <0)
+
+            if (k%2==0)
             {
-                SDL_SetRenderDrawColor(renderer, 87, 65, 47, 255);
+                if (i % 2 == 0)
+                {
+                    SDL_SetRenderDrawColor(renderer, 213, 196, 161, 255);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(renderer, 87, 65, 47, 255);
+                }
             }
             else
             {
-                SDL_SetRenderDrawColor(renderer, 213, 196, 161, 255);
+                if (i % 2 == 1)
+                {
+                    SDL_SetRenderDrawColor(renderer, 213, 196, 161, 255);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(renderer, 87, 65, 47, 255);
+                }
             }
             SDL_RenderFillRect(renderer, &tile);
-            if (abs(ChessBoardToDraw[i][k]) != 1 )
+            if (ChessBoardToDraw[i][k] != 1 )
             {
-                drawPiece(abs(ChessBoardToDraw[i][k]), tile.x, tile.y);
+                drawPiece(ChessBoardToDraw[i][k], tile.x, tile.y);
             }
         }
     }
