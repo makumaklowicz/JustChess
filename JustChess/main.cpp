@@ -14,6 +14,9 @@ float tileScale = 1.75;
 int OffsetX = 0;
 int OffsetY = 0;
 bool selected = false;
+int selectedPiece = 0;
+int mouseXglobal = 0;
+int mouseYglobal = 0;
 
 #pragma region pieces_textures
 int pawn[16][16] = 
@@ -134,13 +137,13 @@ int king[16][16]=
 
 int ChessBoard[8][8] = { {13,  14,  15, 16,  17, 15,  14, 13},             /* Pawn_W      ->   |x| = 2 Pawn_B      ->   |x| = 12 */
                          {12,  12,  12, 12,  12, 12,  12, 12},             /* Rook_W      ->   |x| = 3 Rook_B      ->   |x| = 13 */
-                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
-                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
-                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
-                         { 1,   1,  1,   1,  1,   1,  1,   1},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
+                         { 0,   0,  0,   0,  0,   0,  0,   0},             /* Knight_W    ->   |x| = 4 Knight_B    ->   |x| = 14 */
+                         { 0,   0,  0,   0,  0,   0,  0,   0},             /* Bishop_W    ->   |x| = 5 Bishop_B    ->   |x| = 15 */
+                         { 0,   0,  0,   0,  0,   0,  0,   0},             /* Queen_W     ->   |x| = 6 Queen_B     ->   |x| = 16 */
+                         { 0,   0,  0,   0,  0,   0,  0,   0},             /* King_W      ->   |x| = 7 King_B      ->   |x| = 17 */
                          { 2,   2,  2,   2,  2,   2,  2,   2},             /* (x < 0)   ->   Black tile */
                          { 3,   4,  5,   6,  7,   5,  4,   3}              /* (x > 0)   ->   White tile */
-                                                                };             /* |x| = 1   ->   Empty tile */
+                                                            };             /* |x| = 1   ->   Empty tile */
 
 int ChessBoardToDraw[8][8] = { 0 };
 
@@ -160,7 +163,10 @@ void input()
                 SDL_GetMouseState(&mouseX, &mouseY);
                 mouseX = (int)((mouseX-OffsetX) / tile.w);
                 mouseY = (int)((mouseY-OffsetY) / tile.h);
-                ChessBoardToDraw[mouseY][mouseX] = 16;
+                selectedPiece=ChessBoardToDraw[mouseY][mouseX];
+                mouseXglobal = mouseX;
+                mouseYglobal = mouseY;
+
             }
             if (b.button == SDL_BUTTON_RIGHT)
             {
@@ -188,6 +194,21 @@ void update()
     if (!fullscreen) SDL_SetWindowFullscreen(window, 0);
 }
 
+
+void drawMovesIndicator(int piece)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 120, 150);
+    if (piece == 2)
+    {
+        tile.x = mouseXglobal * tile.w + OffsetX;
+        tile.y = (mouseYglobal - 1) * tile.h + OffsetY;
+        SDL_RenderFillRect(renderer, &tile);
+        tile.y -= tile.h;
+        SDL_RenderFillRect(renderer, &tile);
+
+    }
+    
+}
 
 void drawPiece(int piece, int x, int y)
 {
@@ -239,12 +260,12 @@ void drawPiece(int piece, int x, int y)
                     int scaled_y_cord = i / (tile.h / 16);
                     if (texture[scaled_x_cord][scaled_y_cord] == 1)
                     {
-                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                         SDL_RenderDrawPoint(renderer, x + i, y + k);
                     }
                     else if (texture[scaled_x_cord][scaled_y_cord] == 2)
                     {
-                        SDL_SetRenderDrawColor(renderer, 40, 40, 40, 0);
+                        SDL_SetRenderDrawColor(renderer, 40, 40, 40, 255);
                         SDL_RenderDrawPoint(renderer, x + i, y + k);
                     }
                 }
@@ -287,18 +308,24 @@ void drawChessboard()
                 }
             }
             SDL_RenderFillRect(renderer, &tile);
-            if (ChessBoardToDraw[i][k] != 1 )
+
+
+            if (ChessBoardToDraw[i][k] > 1 )
             {
                 drawPiece(ChessBoardToDraw[i][k], tile.x, tile.y);
             }
         }
+    }
+    if (selectedPiece != 0)
+    {
+        drawMovesIndicator(selectedPiece);
     }
 }
 
 void draw()
 {
     
-    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 0);
+    SDL_SetRenderDrawColor(renderer, 30, 30, 30, 255);
     SDL_RenderFillRect(renderer, NULL);
     drawChessboard();
     SDL_RenderPresent(renderer);
@@ -314,6 +341,7 @@ int main(int argc, char* argv[])
     SDL_SetWindowTitle(window, "JustChess");
     SDL_ShowCursor(1);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
     init();
     while (running)
     {
