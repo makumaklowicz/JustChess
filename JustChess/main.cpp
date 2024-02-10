@@ -164,6 +164,12 @@ void input()
                 mouseX = (int)((mouseX-OffsetX) / tile.w);
                 mouseY = (int)((mouseY-OffsetY) / tile.h);
                 selectedPiece=ChessBoardToDraw[mouseY][mouseX];
+                if (selectedPiece == 1)
+                {
+                    memcpy(ChessBoardToDraw, ChessBoard, sizeof(ChessBoard));
+                    ChessBoardToDraw[mouseY][mouseX] = ChessBoardToDraw[mouseYglobal][mouseXglobal];
+                    ChessBoardToDraw[mouseYglobal][mouseXglobal]=0;
+                }
                 mouseXglobal = mouseX;
                 mouseYglobal = mouseY;
 
@@ -197,9 +203,12 @@ void update()
 
 void drawMovesIndicator(int piece)
 {
+    memcpy(ChessBoard, ChessBoardToDraw, sizeof(ChessBoardToDraw));
     SDL_SetRenderDrawColor(renderer, 0, 0, 120, 150);
     if (piece == 2)
     {
+        ChessBoardToDraw[(mouseYglobal - 1)][mouseXglobal] = 1;
+        ChessBoardToDraw[(mouseYglobal - 2)][mouseXglobal] = 1;
         tile.x = mouseXglobal * tile.w + OffsetX;
         tile.y = (mouseYglobal - 1) * tile.h + OffsetY;
         SDL_RenderFillRect(renderer, &tile);
@@ -316,7 +325,7 @@ void drawChessboard()
             }
         }
     }
-    if (selectedPiece != 0)
+    if (selectedPiece > 1)
     {
         drawMovesIndicator(selectedPiece);
     }
